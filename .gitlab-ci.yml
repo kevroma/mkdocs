@@ -1,0 +1,54 @@
+# base docker image
+image: docker:19
+
+# stages
+stages:
+  - build
+  - test
+  - push
+
+# docker in docker service
+services:
+    - docker:dind
+
+# lOGIN
+before_script:
+    - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+
+# build stage
+Build:
+     stage: build
+     script:
+       # pulling the latest gitlab registry image
+       - docker pull $CI_REGISTRY_IMAGE:latest || true
+       # building new image, tagging SHA for reference, pushing the new image
+       - >
+         docker build
+         --pull
+         --cache-from $CI_REGISTRY_IMAGE:latest
+         --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
+       - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+
+# test stage
+Test:
+    stage: test
+    script:
+       # pulling docker image
+        - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+       # running image, creating sample mkdocs project, building project, testing if html file exists after mkdocs build
+        - docker run -v `pwd`:/docs $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA new my-project
+        - docker run -v `pwd`/my-project:/docs $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA build
+        - cd my-project/site
+        - test -f "index.html"
+
+# pushing docker tag to sync with gitlab tag for reference
+Push tag:
+  variables:
+    GIT_STRATEGY: none
+  stage: push
+  only:
+    - tags
+  script:
+    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - docker tag $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
