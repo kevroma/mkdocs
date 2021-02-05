@@ -3,7 +3,7 @@ GitLab website is used for this project
 # Git Clone
 
 **(read-access only)**  
-$git clone https://gitlab.com/kevzor/mkdocs.git
+$git clone https://gitlab.com/kevzor/mkdocs.git  
 user: <assigned_user>  
 pass: <assigned_token>
 
