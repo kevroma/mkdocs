@@ -37,3 +37,5 @@ docker run -p 8000:8000 -v "$serveinputdir/$myprojectname":/docs $GITLABIMAGE se
 
 # LOGOUT
 docker logout registry.gitlab.com
+
+## exit
