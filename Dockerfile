@@ -1,5 +1,5 @@
 # getting base image alpine
-FROM alpine:3.14
+FROM alpine:3.9
 
 # installing mkdocs
 RUN apk update && apk upgrade \
