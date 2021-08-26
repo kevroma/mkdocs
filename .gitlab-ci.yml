@@ -5,6 +5,7 @@ image: docker:19
 stages:
   - build
   - test
+  - checkcode
   - push
 
 # docker in docker service
@@ -40,8 +41,10 @@ Test:
         - docker run -v `pwd`/my-project:/docs $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA build
         - cd my-project/site
         - test -f "index.html"
-      
+
 # code check
+Check:
+    stage: checkcode
     variables:
       SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
       GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
@@ -59,7 +62,7 @@ Test:
         - merge_requests
         - master
         - develop
-
+        
 # pushing docker tag to sync with gitlab tag for reference
 Push tag:
   variables:
