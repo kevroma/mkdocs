@@ -23,7 +23,6 @@ image: docker:19
 stages:
   - build
   - test
-  - checkcode
   - push
 
 # docker in docker service
