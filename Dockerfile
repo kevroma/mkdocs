@@ -1,5 +1,5 @@
 # getting base image alpine
-FROM alpine:3.9
+FROM openjdk:15-jdk-alpine
 
 # installing mkdocs
 RUN apk update && apk upgrade \
